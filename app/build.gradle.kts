@@ -1,24 +1,27 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.jetbrains.kotlin.android)
-    id("org.jetbrains.kotlin.kapt")
+    id ("kotlin-kapt")
 
 }
 
 android {
     namespace = "com.example.tmdb_cleanarchitecture"
-    compileSdk = 34
+    compileSdk = 35
 
     defaultConfig {
         applicationId = "com.example.tmdb_cleanarchitecture"
         minSdk = 24
-        targetSdk = 34
+        targetSdk = 35
         versionCode = 1
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
         buildConfigField("String", "API_KEY", "\"1234451198969fd38c674013e0aba71f\"")
+        buildConfigField("String" , "BASE_URL" , "\" https://api.themoviedb.org/3/ \"")
+
+
 
     }
 
@@ -67,6 +70,7 @@ dependencies {
     // Room Database
     implementation("androidx.room:room-runtime:2.6.1")
     implementation("androidx.room:room-ktx:2.6.1")
+    kapt ("androidx.room:room-compiler:2.6.1")
 
     //Dagger
     implementation ("com.google.dagger:dagger-android:2.52")
@@ -89,11 +93,14 @@ dependencies {
 
     //okhttp and logging interceptor
     implementation("com.squareup.okhttp3:okhttp:4.7.0")
-    implementation("com.squareup.okhttp3:logging-interceptor4.7.0")
 
     //Glide
-    implementation ("com.github.bumptech.glide:glide:5.0.0")
-    kapt ("com.github.bumptech.glide:compiler:5.0.0")
+    implementation ("com.github.bumptech.glide:glide:4.15.1")
+    kapt ("com.github.bumptech.glide:compiler:4.15.1")
 
 
+}
+
+kapt {
+    correctErrorTypes = true
 }

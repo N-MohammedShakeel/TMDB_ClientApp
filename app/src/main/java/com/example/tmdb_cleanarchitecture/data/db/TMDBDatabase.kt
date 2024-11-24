@@ -16,5 +16,4 @@ abstract class TMDBDatabase: RoomDatabase() {
     abstract fun movieDao(): MovieDao
     abstract fun tvDao(): TvShowDao
     abstract fun artistDao(): ArtistDao
-
 }

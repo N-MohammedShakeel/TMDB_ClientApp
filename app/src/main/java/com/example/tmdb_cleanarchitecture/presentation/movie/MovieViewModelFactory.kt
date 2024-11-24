@@ -10,6 +10,9 @@ class MovieViewModelFactory(
     private val updateMoviesUseCase: UpdateMoviesUseCase
 ):ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
-        return MovieViewModel(getMoviesUseCase,updateMoviesUseCase) as T
+        if (modelClass.isAssignableFrom(MovieViewModel::class.java)) {
+            return MovieViewModel(getMoviesUseCase, updateMoviesUseCase) as T
+        }
+        throw IllegalArgumentException("Unknown ViewModel class")
     }
 }

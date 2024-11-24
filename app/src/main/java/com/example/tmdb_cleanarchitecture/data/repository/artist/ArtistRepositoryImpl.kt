@@ -3,27 +3,27 @@ package com.example.tmdb_cleanarchitecture.data.repository.artist
 import android.util.Log
 import com.example.tmdb_cleanarchitecture.data.model.artist.Artist
 import com.example.tmdb_cleanarchitecture.data.model.movie.Movie
+import com.example.tmdb_cleanarchitecture.data.repository.artist.datasource.ArtistCacheDataSource
 import com.example.tmdb_cleanarchitecture.data.repository.artist.datasource.ArtistLocalDataSource
 import com.example.tmdb_cleanarchitecture.data.repository.artist.datasource.ArtistRemoteDataSource
 import com.example.tmdb_cleanarchitecture.data.repository.artist.datasourceImpl.ArtistCacheDataSourceImpl
 import com.example.tmdb_cleanarchitecture.domain.repository.ArtistRepository
 
 class ArtistRepositoryImpl(
-    private val artistCacheDataSource: ArtistLocalDataSource,
+    private val artistRemoteDataSource: ArtistRemoteDataSource,
     private val artistLocalDataSource: ArtistLocalDataSource,
-    private val artistRemoteDataSource: ArtistRemoteDataSource
-
+    private val artistCacheDataSource: ArtistCacheDataSource
 ) :ArtistRepository{
 
     override suspend fun getArtists(): List<Artist> {
-        return getArtistsFromAPI()
+        return getArtistsFromCache()
     }
 
     override suspend fun updateArtists(): List<Artist> {
         val newListOfArtists = getArtistsFromAPI()
         artistLocalDataSource.clearAll()
-        artistCacheDataSource.saveArtistsToDB(newListOfArtists)
-        artistCacheDataSource.saveArtistsToDB(newListOfArtists)
+        artistLocalDataSource.saveArtistsToDB(newListOfArtists)
+        artistCacheDataSource.saveArtistsToCache(newListOfArtists)
 
         return newListOfArtists
     }
@@ -70,7 +70,7 @@ class ArtistRepositoryImpl(
         lateinit var artistList:List<Artist>
 
         try {
-            artistList = artistCacheDataSource.getArtistsFromDB()
+            artistList = artistCacheDataSource.getArtistsFromCache()
 
         }catch (e:Exception){
             Log.i("MyTag",e.message.toString())
@@ -79,8 +79,8 @@ class ArtistRepositoryImpl(
         if (artistList.isNotEmpty()){
             return artistList
         }else{
-            artistList = getArtistsFromAPI()
-            artistCacheDataSource.saveArtistsToDB(artistList)
+            artistList = getArtistsFromDB()
+            artistCacheDataSource.saveArtistsToCache(artistList)
         }
 
         return artistList

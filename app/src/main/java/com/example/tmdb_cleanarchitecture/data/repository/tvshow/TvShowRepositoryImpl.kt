@@ -2,15 +2,16 @@ package com.example.tmdb_cleanarchitecture.data.repository.tvshow
 
 import android.util.Log
 import com.example.tmdb_cleanarchitecture.data.model.tvshow.TvShow
-import com.example.tmdb_cleanarchitecture.data.repository.tvshow.datasourceImpl.TvShowCacheDataSourceImpl
-import com.example.tmdb_cleanarchitecture.data.repository.tvshow.datasourceImpl.TvShowLocalDataSourceImpl
-import com.example.tmdb_cleanarchitecture.data.repository.tvshow.datasourceImpl.TvShowRemoteDataSourceImpl
+import com.example.tmdb_cleanarchitecture.data.repository.tvshow.datasource.TvShowCacheDataSource
+import com.example.tmdb_cleanarchitecture.data.repository.tvshow.datasource.TvShowLocalDataSource
+import com.example.tmdb_cleanarchitecture.data.repository.tvshow.datasource.TvShowRemoteDataSource
 import com.example.tmdb_cleanarchitecture.domain.repository.TvShowRepository
 
 class TvShowRepositoryImpl(
-    private val TvShowRemoteDataSourceImpl: TvShowRemoteDataSourceImpl,
-    private val TvShowLocalDataSourceImpl: TvShowLocalDataSourceImpl,
-    private val TvShowCacheDataSourceImpl: TvShowCacheDataSourceImpl
+    private val tvshowRemoteDataSource:TvShowRemoteDataSource,
+    private val tvshowLocalDataSource: TvShowLocalDataSource,
+    private val tvshowCacheDataSource: TvShowCacheDataSource
+
 ):TvShowRepository {
 
     override suspend fun getTvShows(): List<TvShow> {
@@ -19,9 +20,9 @@ class TvShowRepositoryImpl(
 
     override suspend fun updateTvShows(): List<TvShow> {
         val newListOfTvShowss = getTvShowsFromAPI()
-        TvShowLocalDataSourceImpl.clearAll()
-        TvShowCacheDataSourceImpl.saveTvShowsToCache(newListOfTvShowss)
-        TvShowCacheDataSourceImpl.saveTvShowsToCache(newListOfTvShowss)
+        tvshowLocalDataSource.clearAll()
+        tvshowCacheDataSource.saveTvShowsToCache(newListOfTvShowss)
+        tvshowCacheDataSource.saveTvShowsToCache(newListOfTvShowss)
 
         return newListOfTvShowss
     }
@@ -30,8 +31,7 @@ class TvShowRepositoryImpl(
         lateinit var TvShowList:List<TvShow>
 
         try {
-
-            val response = TvShowRemoteDataSourceImpl.getTvShows()
+            val response = tvshowRemoteDataSource.getTvShows()
             val body = response.body()
             if(body!=null){
                 TvShowList = body.tvShows!!
@@ -47,7 +47,7 @@ class TvShowRepositoryImpl(
         lateinit var TvShowList:List<TvShow>
 
         try {
-            TvShowList = TvShowLocalDataSourceImpl.getTvShowsFromDB()
+            TvShowList = tvshowLocalDataSource.getTvShowsFromDB()
 
         }catch (e:Exception){
             Log.i("MyTag",e.message.toString())
@@ -57,7 +57,7 @@ class TvShowRepositoryImpl(
             return TvShowList
         }else{
             TvShowList = getTvShowsFromAPI()
-            TvShowLocalDataSourceImpl.saveTvShowsToDB(TvShowList)
+            tvshowLocalDataSource.saveTvShowsToDB(TvShowList)
         }
 
         return TvShowList
@@ -68,7 +68,7 @@ class TvShowRepositoryImpl(
         lateinit var TvShowList:List<TvShow>
 
         try {
-            TvShowList = TvShowCacheDataSourceImpl.getTvShowsFromCache()
+            TvShowList = tvshowCacheDataSource.getTvShowsFromCache()
 
         }catch (e:Exception){
             Log.i("MyTag",e.message.toString())
@@ -78,7 +78,7 @@ class TvShowRepositoryImpl(
             return TvShowList
         }else{
             TvShowList = getTvShowsFromDB()
-            TvShowCacheDataSourceImpl.saveTvShowsToCache(TvShowList)
+            tvshowCacheDataSource.saveTvShowsToCache(TvShowList)
         }
 
         return TvShowList

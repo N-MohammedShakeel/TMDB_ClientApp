@@ -6,6 +6,7 @@ import com.example.tmdb_cleanarchitecture.data.repository.movie.datasource.Movie
 class MovieCacheDataSourceImpl: MovieCacheDataSource {
 
     private var movieList = ArrayList<Movie>()
+
     override suspend fun getMoviesFromCache(): List<Movie> {
         return movieList
     }
@@ -13,6 +14,5 @@ class MovieCacheDataSourceImpl: MovieCacheDataSource {
     override suspend fun saveMoviesToCache(movies: List<Movie>) {
         movieList.clear()
         movieList = ArrayList(movies)
-
     }
 }
